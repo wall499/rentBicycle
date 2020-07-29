@@ -1,0 +1,309 @@
+﻿
+<div class="row" id="card">
+
+
+
+	<div class="col-lg-12">
+		<h1 class="page-header">办卡</h1>
+		<button class="btn btn-primary" data-toggle="modal"
+			data-target="#optDiv"
+			@click="addDiv()">办理新卡</button>
+			
+			<div v-show="type!=1" 
+			:class="{alert:true,'alert-success':type==2,'alert-danger':type==3}">
+        	{{type==2?"操作成功":"操作失败，请联系管理员"}}
+        </div>
+			
+	</div>
+
+	<div class="col-lg-12">
+		<div class="panel panel-default">
+			<div class="panel-heading">车卡列表</div>
+			<!-- /.panel-heading -->
+			<div class="panel-body">
+				<div id="dataTables-example_wrapper"
+					class="dataTables_wrapper form-inline dt-bootstrap no-footer">
+					
+					<div class="row">
+						<div class="col-sm-12">
+							<div id="dataTables-example_filter" class="dataTables_filter">
+								<label> 卡号: 
+									<input type="text" v-model.trim.lazy="queryCondition.card_code"
+										class="form-control input-sm"
+										aria-controls="dataTables-example">
+								</label> 
+								<label>	持卡人姓名： 
+									<input type="text" v-model.trim.lazy="queryCondition.name"
+									class="form-control input-sm"
+									aria-controls="dataTables-example">
+								</label>
+								<button type="button" class="btn btn-info" @click="goPage(1)">查询</button>
+							</div>
+						</div>
+					</div>
+					
+					<div class="row">
+						<div class="col-sm-12">
+							<table width="100%"
+								class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline"
+								role="grid" aria-describedby="dataTables-example_info"
+								style="width: 100%;">
+								<thead>
+									<tr role="row">
+										<td>序号</td>
+  		                       			<td>卡号</td>
+  										<td>卡类型</td>
+  										<td>姓名</td>
+  										<td>身份证号</td>
+  										<td>性别</td>
+  										<td>联系电话</td>
+  										<td>手机</td>
+  										<td>邮箱</td>
+  										<td>住址</td>
+  										<td>工作单位</td>
+  										<td>注销标志</td>
+  										<td>月票金额</td>
+  										<td>冻结金额</td>
+  										<td>钱包余额</td>
+  										<td>卡状态</td>
+										<td>操作</td>
+									</tr>
+								</thead>
+								<tbody>
+									<tr v-for="(item,index) in list"
+										:class="{gradeA:true,even:index%2==0,odd:index%2==1}"
+										role="row">
+										<td class="sorting_1">{{item.card_id}}</td>
+										<td>{{item.card_code}}</td>
+										<td v-if="item.card_type==1">A卡</td>
+										<td v-if="item.card_type==2">D卡</td>
+										<td v-if="item.card_type==3">市民卡/社保卡</td>
+										<td v-if="item.card_type==4">员工卡</td>
+										<td v-if="item.card_type==5">维修调度卡</td>
+										<td>{{item.name}}</td>
+										<td>{{item.idcard}}</td>
+										<td>{{item.sex}}</td>
+										<td>{{item.telphone}}</td>
+										<td>{{item.mobile}}</td>
+										<td>{{item.email}}</td>
+										<td>{{item.address}}</td>
+										<td>{{item.work}}</td>
+										<td v-if="item.zxbj=='0'">正常</td>
+										<td v-if="item.zxbj=='1'">已注销</td>
+										<td>{{item.monthly_money}}</td>
+										<td>{{item.frozen_money}}</td>
+										<td>{{item.wallet_money}}</td>
+										<td v-if="item.status==1">正常</td>
+										<td v-if="item.status==2">锁定</td>
+										<td>
+										<button title="修改" type="button" data-toggle="modal" data-target="#optDiv"
+												class="btn btn-info btn-circle" @click="updateDiv(index)" v-show="item.zxbj=='0'">
+												<i class="fa fa-check"></i>
+										</button>
+											
+										<button title="挂失" type="button"
+												class="btn btn-warning btn-circle" @click="reportLoss(index)" v-show="item.zxbj=='0'">
+												<i class="fa fa-times"></i>
+										</button>
+										
+										<button title="注销" type="button"
+												class="btn btn-warning btn-circle" @click="cancel(index)" v-show="item.zxbj=='0'">
+												<i class="fa fa-times"></i>
+										</button>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+					
+					
+					<div class="row">
+						<div class="col-sm-6">
+							<div class="dataTables_info" id="dataTables-example_info"
+								role="status" aria-live="polite">
+								每页显示{{pageInfo.pageSize}}条，共{{pageInfo.total}}条</div>
+						</div>
+						<div class="col-sm-6">
+							<div class="dataTables_paginate paging_simple_numbers"
+								id="dataTables-example_paginate">
+								<ul class="pagination">
+									<li
+										:class="{paginate_button:true, previous:true, disabled:pageInfo.isFirstPage}"
+										aria-controls="dataTables-example" tabindex="0"
+										id="dataTables-example_previous"><a
+										href="javascript:void(0)" @click="goPage(pageInfo.pageNum-1)">上一页</a>
+									</li>
+
+
+									<li v-for="item in pageInfo.navigatepageNums"
+										:class="{paginate_button:true, active:item==pageInfo.pageNum}"
+										aria-controls="dataTables-example" tabindex="0"><a
+										href="javascript:void(0)" @click="goPage(item)">{{item}}</a></li>
+
+									<li
+										:class="{paginate_button:true, next:true, disabled:pageInfo.isLastPage}"
+										aria-controls="dataTables-example" tabindex="0"
+										id="dataTables-example_next"><a href="javascript:void(0)"
+										@click="goPage(pageInfo.pageNum+1)">下一页</a></li>
+								</ul>
+							</div>
+						</div>
+					</div>
+					
+					
+					
+					
+				</div>
+
+			</div>
+		</div>
+	</div>
+
+
+
+
+
+	<!-- 新增和修改的弹出层 -->
+	<div class="modal fade" id="optDiv" tabindex="-1" role="dialog"
+		aria-labelledby="myModalLabel" aria-hidden="true"
+		style="display: none;">
+		<div class="modal-dialog" style="width: 1200px;">
+			<div class="modal-content" >
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-hidden="true">×</button>
+					<h4 class="modal-title" id="myModalLabel">{{isUpdate?"修改车卡信息":"新增车卡"}}</h4>
+				</div>
+				<div class="modal-body">
+					<div v-show="isUpdate" class="form-group">
+						<label>卡id</label> <input class="form-control"
+							readonly="readonly" :value="cardData.card_id">
+					</div>
+					
+					<div class="form-group">
+						<label>卡号</label> 
+						<input placeholder="卡号有7位数的数字组成；市民卡/社保卡 卡片的身份证号码即是卡号"
+							class="form-control" v-model.lazy.trim="cardData.card_code"/>
+					</div>
+					
+					<div v-show="!valid[0]" class="alert alert-danger">
+						非法：卡号有7位数的数字组成；市民卡/社保卡 卡片的身份证号码即是卡号
+					</div>
+
+					<div class="form-group">
+						<label>卡类型</label> 
+						<select v-model.lazy.trim="cardData.card_type">
+							<option value="" selected>请选择</option>
+							<option value=1>A卡</option>
+							<option value=2>D卡</option>
+							<option value=3>市民卡/社保卡</option>
+							<option value=4>员工卡</option>
+							<option value=5>维修调度卡</option>
+						</select>
+					</div>
+					
+					<div v-show="!valid[1]" class="alert alert-danger">
+						非法：未选择卡类型
+					</div>
+					
+					<div class="form-group">
+						<label>名字</label> <input placeholder="由1-50位中文汉字组成"
+							class="form-control" v-model.lazy.trim="cardData.name"
+							 />
+					</div>
+					
+					<div v-show="!valid[2]" class="alert alert-danger">
+						非法：由2-50位中文汉字组成
+					</div>
+
+					<div class="form-group">
+						<label>身份证号</label> <input 
+							class="form-control" v-model.lazy.trim="cardData.idcard"
+							 />
+					</div>
+					
+					<div v-show="!valid[3]" class="alert alert-danger">
+						非法：身份证号码不正确
+					</div>
+									
+					<div class="form-group">
+						<label>性别</label> 
+						<select v-model.lazy.trim="cardData.sex">
+							<option value="" selected>请选择</option>
+							<option value="男" >男</option>
+							<option value="女">女</option>
+						</select>
+					</div>
+					
+					<div v-show="!valid[4]" class="alert alert-danger">
+						非法：未选择性别
+					</div>
+					
+					<div class="form-group">
+						<label>联系电话</label> <input placeholder="由区号+固定电话组成"
+							class="form-control" v-model.lazy.trim="cardData.telphone"
+							 />
+					</div>
+					
+					<div v-show="!valid[5]" class="alert alert-danger">
+						非法：固定电话输入不正确
+					</div>
+					
+					<div class="form-group">
+						<label>手机</label> <input placeholder="由非0开头的11位数字组成"
+							class="form-control" v-model.lazy.trim="cardData.mobile"
+							 />
+					</div>
+					
+					<div v-show="!valid[6]" class="alert alert-danger">
+						非法：由非0开头的11位数字组成
+					</div>
+					
+					<div class="form-group">
+						<label>邮箱</label> <input 
+							class="form-control" v-model.lazy.trim="cardData.email"
+							 />
+					</div>
+					
+					<div v-show="!valid[7]" class="alert alert-danger">
+						非法：邮箱地址不正确
+					</div>
+					
+					<div class="form-group">
+						<label>地址</label> <input placeholder="由1-100位中文汉字组成"
+							class="form-control" v-model.lazy.trim="cardData.address"
+							 />
+					</div>
+					
+					<div v-show="!valid[8]" class="alert alert-danger">
+						非法：由1-100位中文汉字组成
+					</div>
+						
+					<div class="form-group">
+						<label>工作单位</label> <input placeholder="由1-100位中文汉字组成"
+							class="form-control" v-model.lazy.trim="cardData.work"
+							 />
+					</div>
+					
+					<div v-show="!valid[9]" class="alert alert-danger">
+						非法：由1-100位中文汉字组成
+					</div>
+					
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+					<button @click="save()" type="button"
+						class="btn btn-primary">保存</button>
+				</div>
+			</div>
+			<!-- /.modal-content -->
+		</div>
+		<!-- /.modal-dialog -->
+	</div>
+
+
+</div>
+<!-- 相对路径 相对于/main/index.html -->
+<script type="text/javascript" src="../js/card.js"></script>
+

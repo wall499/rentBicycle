@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace - 对应具体的接口的名字  -->
+<mapper namespace="com.wall675.dao.Bicycle_deployMapper">
+
+	 	<!-- 记录车辆调配明细，调出的内容可以不填写，调出原因填写（4：普通调出） -->
+  	<insert id="insertBicycleDeployOut" >
+		insert into bicycle_deploy 
+		(bicycle_id,from_pile_id,from_card_id,from_time,from_reason)
+		values
+	     (#{bicycle_id},#{pile_id},#{card_id},#{from_time},4)
+	</insert> 
+	
+	<!-- 记录车辆调配明细，调的内容可以不填写，调入原因填写（4：普通调出） -->
+  	<update id="setBicycleDeployIn" >
+  		update 
+  			bicycle_deploy 
+  		set 
+  		to_pile_id=#{pile_id},to_time=#{to_time},to_reason=5
+  		where 
+  		deploy_id=#{deploy_id}
+	</update> 
+	
+	<!-- 根据车辆id和调度时间查询明细id -->
+	<select id="selDeployId" resultType="java.lang.Integer">
+		select
+			deploy_id
+		from 
+			bicycle_deploy	
+		where
+			bicycle_id=#{bicycle_id} and from_time=#{from_time}
+	</select>
+	
+	   <!--    根据车辆id查询调配明细记录id（准备进行普通调入） -->
+	 	<select id="selDeployedId" resultType="java.lang.Integer">
+		select
+			deploy_id
+		from 
+			bicycle_deploy	
+		where
+			bicycle_id=#{bicycle_id}  and from_pile_id is not null and to_pile_id is null
+	</select>
+	
+	<!-- 车辆普通调入时，调配明细表中填入调入时间，调入车桩，调入原因等 -->
+		<update id="setDeploy" >
+  		update 
+  			bicycle_deploy 
+  		set 
+  		to_pile_id=#{pile_id},to_time=#{to_time},to_reason=5
+  		where 
+  		deploy_id=#{deploy_id}
+  	</update>
+	
+	
+</mapper>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace - 对应具体的接口的名字  -->
+<mapper namespace="com.wall675.dao.Bicycle_dealMapper">
+
+			<!-- 车辆的费用流水-->
+	 <select id="listSpendDetail" resultType="bicycle_deal" parameterType="bicycle_deal">
+		select chg_money from bicycle_deal where bicycle_id=#{bicycle_id} order by create_time desc
+    </select> 
+    
+    <!-- 新增普通调出的业务流水-->
+    <insert id="addDeal">
+	    insert into bicycle_deal 
+	  		(bicycle_id,pile_id,card_id,create_time,record_id,deal_type,deal_name,is_fee,CHG_MONEY) 
+	  	values
+	  		(#{bicycle_id},#{pile_id},#{card_id},#{create_time},#{record_id},4,"普通调出",0,0)
+ 	 </insert>
+ 	 
+ 	 <!-- 新增普通调入的业务流水-->
+ 	 <insert id="addDeployIn">
+	    insert into bicycle_deal 
+	  		(bicycle_id,pile_id,create_time,record_id,deal_type,deal_name,is_fee,CHG_MONEY) 
+	  	values
+	  		(#{bicycle_id},#{pile_id},#{create_time},#{record_id},5,"普通调入",0,0)
+ 	 </insert>
+</mapper>

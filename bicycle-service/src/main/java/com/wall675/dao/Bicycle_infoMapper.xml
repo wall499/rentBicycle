@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace - 对应具体的接口的名字  -->
+<mapper namespace="com.wall675.dao.Bicycle_infoMapper">
+
+<!--将被选中的车辆的车辆状态改成（4：普通调出），将所在车桩的状态改成（2：无车）-->
+	<update id="updateOutBicycle" >
+  		update 
+  			bicycle_info 
+  		set 
+  		status=4,pile_id=null
+  		where 
+  		bicycle_id=#{bicycle_id} 
+  	</update>
+  	
+  	<!--将被选中的车辆状态从（4普通调出）变为(3在桩)-->
+	<update id="updateInBicycle" >
+  		update 
+  			bicycle_info 
+  		set 
+  		status=3,pile_id=#{param2} 
+  		where 
+  		bicycle_id=#{param1} and status=4
+  	</update>
+  	
+  	<!--列出所有为普通调出的车辆-->
+  	<select id="selInfo" resultType="Bicycle_info">
+		select
+			*
+		from 
+			bicycle_info	
+		where
+			status=4
+	</select>
+
+</mapper>

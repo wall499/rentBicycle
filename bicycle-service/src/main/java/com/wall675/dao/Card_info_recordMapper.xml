@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace - 对应具体的接口的名字  -->
+<mapper namespace="com.wall675.dao.Card_info_recordMapper">
+	<!--存入卡信息记录表-->
+   <insert id="insertCardInfoRecord"  >
+    	insert into card_info_record (card_id,info_type,create_time,user_id,remark)  values 
+    	(#{card_id},#{info_type},#{create_time},#{user_id},#{remark})
+    	<selectKey order="AFTER" resultType="int" keyProperty="record_id">
+    		select last_insert_id();
+    	</selectKey>
+    </insert>
+
+
+  
+  
+   </mapper>

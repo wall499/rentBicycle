@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace - 对应具体的接口的名字  -->
+<mapper namespace="com.wall675.dao.Card_recordMapper">
+	 <!-- 判读当月月卡是否已经充值过 -->
+       <select id="judgeCharge" resultType="Integer" parameterType="card_record">
+    select  count(c.record_id)   from
+	card_record c,(SELECT record_id,DATE_FORMAT(create_time, "%Y-%m" ) as curmonth FROM card_record)t
+	where t.record_id=c.record_id and c.card_id=#{card_id} and c.FEE_TYPE=1 and CHG_MONTHLY_MONEY!=0 and t.curmonth=#{curMonth}
+      </select>
+	
+	<!-- 平均租车次数 -->
+   <select id="avgRentTimes" resultType="Double" >
+  		select ifnull(count(card_id)/count(distinct card_id),0) as g,count(card_id) as sum,count(distinct card_id) as num from card_record where fee_type=2  
+  		<if test="date!=null and date!=''">
+  		and create_time like concat('%',#{date},'%') 
+  		</if>
+  		<if test="card_id!=0">
+	 and card_id=#{card_id}
+	</if>
+	</select>
+	
+	<!-- 总租车次数 -->
+   <select id="sumRentTimes" resultType="Integer" >
+  	select IFNULL(count(card_id),0) from card_record where fee_type=2 
+  	<if test="date!=null and date!=''">
+	and create_time like concat('%',#{date},'%')
+	</if>
+	<if test="card_id!=0">
+	 and card_id=#{card_id}
+	</if>
+	</select>
+
+	 <!--有租车记录的卡张数-->
+	<select id="countCardRecord" resultType="Integer" >
+		select count(distinct card_id)  from card_record where fee_type=2
+	</select>
+	 
+	   <!-- 总充值金额 feetype=1 充值 -->
+   <select id="sumChgMoney" resultType="Double">
+	 select  IFNULL(sum(CHG_MONTHLY_MONEY)+sum(chg_wallet_money),0.0) as sum from card_record where  fee_type=1 
+	 <if test="date!=null and date!=''">
+			and create_time like concat('%',#{date},'%')
+	</if>
+	<if test="card_id!=0">
+	 and card_id=#{card_id}
+	</if>
+	</select>
+	
+   <!-- 总消费金额  2,租车 3，消费 -->
+   <select id="sumSpendMoney" resultType="Double">
+ 	select  IFNULL(abs(sum(CHG_MONTHLY_MONEY)+sum(chg_wallet_money)),0.0) from card_record where  fee_type=3
+ 	<if test="date!=null and date!=''">
+			and create_time like concat('%',#{date},'%')
+	</if>
+	<if test="card_id!=0">
+	 and card_id=#{card_id}
+	</if>
+  </select> 
+  
+   
+  
+  <!--卡费用流水填写，将本次充值流水信息写入到卡费用流水中，费用类型为（1：充值）。（5：注销时冻结金额）ZXBJ=1 注销-->
+   <insert id="insertCardRecord" >
+    	insert into card_record (card_id,fee_type,chg_monthly_money,chg_wallet_money,chg_frozen_money,create_time,user_id,remark,ZXBJ)  values 
+    	(#{card_id},#{fee_type},#{chg_monthly_money},#{chg_wallet_money},#{chg_frozen_money},#{create_time},#{user_id},#{remark},#{ZXBJ})
+    	<selectKey order="AFTER" resultType="int" keyProperty="card_id">
+    		select last_insert_id();
+    	</selectKey>
+    </insert>
+  
+   <!-- 单张卡的充值次数 -->
+   <select id="sumChargeTimes" resultType="Integer">
+	select count(record_id) from card_record where fee_type=1 and card_id=#{card_id}
+	</select>
+	
+	  <!-- 单张卡费用流水 倒叙排列 -->
+   <select id="listCardRecord" resultType="card_record" parameterType="Integer">
+	select * from card_record where card_id=#{card_id} order by CREATE_TIME desc 
+	</select>
+	
+  
+   </mapper>

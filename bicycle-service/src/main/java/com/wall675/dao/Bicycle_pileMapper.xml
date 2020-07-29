@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace - 对应具体的接口的名字  -->
+<mapper namespace="com.wall675.dao.Bicycle_pileMapper">
+	<!--将被选中的车辆的车辆状态改成（4：普通调出），将所在车桩的状态改成（2：无车）-->
+	<update id="updatePile"  >
+  		update 
+  			bicycle_pile
+  		set 
+  		status=2,bicycle_id=null 
+  		where 
+  		bicycle_id=#{bicycle_id} and status=1
+  	</update>
+  	
+  	
+  	<update id="updateDeployedPile" >
+  		update 
+  			bicycle_pile 
+  		set 
+  		status=1,bicycle_id=#{param1} 
+  		where 
+  		pile_id=#{param2} and status=2
+  	</update>
+  	
+  		<!--查询有车的车桩-->
+  		<!-- 选中车点的所有车桩 -->
+  	<select id="selPileInfo" resultType="Bicycle_pile">
+		select
+			*
+		from 
+			bicycle_pile	
+		where
+			1=1
+	<if test="pile_id!=null and pile_id!=''">
+	 and pile_id=#{pile_id}
+	</if>
+	<if test="station_id!=null and station_id!=''">
+	 and station_id=#{station_id}
+	</if>
+	</select>
+	
+	
+  	
+
+</mapper>

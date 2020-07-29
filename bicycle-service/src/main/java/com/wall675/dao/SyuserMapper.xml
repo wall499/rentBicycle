@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace - 对应具体的接口的名字  -->
+<mapper namespace="com.wall675.dao.SyuserMapper">
+	<select id="login" parameterType="com.wall675.model.Syuser" resultType="com.wall675.model.Syuser">
+		select
+			<include refid="syuserResult"></include>
+		from
+			syuser
+		where
+			login_name = #{loginName}
+		and
+			password = md5(#{password})
+	</select>
+	
+	<select id="phoneLogin" parameterType="com.wall675.model.Syuser" resultType="com.wall675.model.Syuser">
+		select
+			<include refid="syuserResult"></include>
+		from
+			syuser
+		where
+			MOBILE_PHONE = #{mobilePhone}
+	</select>
+	
+	<sql id="syuserResult">
+		USER_ID userId,
+		ROLE_ID roleId,
+		LOGIN_NAME loginName,
+		USERNAME ,
+		PASSWORD,
+		ACTIVE_FLAG activeFlag,
+		ZXBJ,
+		OFFICE_PHONE officePhone,
+		MOBILE_PHONE mobilePhone,
+		EMAIL
+	</sql>
+	
+</mapper>

@@ -1,0 +1,3 @@
+com\aowin\interceptor\LoginInterceptor.class
+com\aowin\controller\MsPhaseController.class
+com\aowin\controller\SyuserController.class

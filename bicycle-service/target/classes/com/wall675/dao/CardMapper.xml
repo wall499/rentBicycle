@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace - 对应具体的接口的名字  -->
+<mapper namespace="com.wall675.dao.CardMapper">
+
+	  <!-- 挂失卡 -->
+     <update id="reportLossCard" >
+    	update card 
+    	set 
+    	status=2 
+    	where card_code=#{card_code}
+    </update>
+    
+    
+    
+     <!-- 注销卡 -->
+     <update id="cancelAccount" >
+    	update card 
+    	set 
+    	ZXBJ='1',monthly_money=0.0,wallet_money=0.0,frozen_money=0.0
+    	where card_code=#{card_code}
+    </update>
+    
+   
+   <!-- 全部卡的信息 -->
+   	<select id="listByCard" resultType="card" parameterType="card">
+    	select * from card 
+    	<where>
+			<if test="name != null and name != ''">
+				and name like concat('%',#{name},'%')
+			</if>
+			<if test="card_code != null and card_code != ''">
+				and card_code like concat('%',#{card_code},'%')
+			</if>
+		</where>
+	</select>
+   
+     <!-- 卡信息修改 -->
+     <update id="edit" parameterType="card">
+    	<!-- update emp set ename=#{ename} where empno=#{empno} -->
+    	update card
+		<set>
+		
+		card_code=#{card_code},card_type=#{card_type},name=#{name},idcard=#{idcard},sex=#{sex},telphone=#{telphone},mobile=#{mobile},email=#{email},address=#{address},work=#{work},ZXBJ=#{ZXBJ},monthly_money=#{monthly_money},frozen_money=#{frozen_money},wallet_money=#{wallet_money},status=#{status}
+			
+		</set>
+		where card_id=#{card_id}
+    </update>
+    
+    
+       <insert id="save" parameterType="card" >
+    	<!-- insert into emp  (empno,ename)  values (#{empno},#{ename}) -->
+    	insert into card (card_code,card_type,name,idcard,sex,telphone,mobile,email,address,work,ZXBJ,monthly_money,frozen_money,wallet_money,status)  values 
+    	(#{card_code},#{card_type},#{name},#{idcard},#{sex},#{telphone},#{mobile},#{email},#{address},#{work},'0',#{monthly_money},#{frozen_money},#{wallet_money},1)
+    	<selectKey order="AFTER" resultType="int" keyProperty="card_id">
+    		select last_insert_id();
+    	</selectKey>
+    </insert>
+    
+    <!-- 根据卡号查询此卡信息 ,查重-->
+    <select id="selCard" resultType="card">
+		select
+			*
+		from 
+			card	
+		where
+			 card_code=#{card_code}
+	</select>
+	
+		<!-- 现冻结金额 -->
+	<select id="sumFrozenMoney"  resultType="Double">
+	select sum(frozen_money)  from card where 1=1
+	<if test="card_id!=0">
+	 and card_id=#{card_id}
+	</if>
+	</select>
+	
+	
+	<!-- 现可用余额 -->
+	 <select id="sumMoney"  resultType="Double">
+	select sum(monthly_money)+sum(wallet_money) as sum from card where 1=1
+	<if test="card_id!=0">
+	 and card_id=#{card_id}
+	</if>
+	</select>
+	
+	
+	<!-- 根据输入的card_code，查card_id -->
+	<select id="selCardId" parameterType="String" resultType="java.lang.Integer">
+		select
+			card_id
+		from 
+			card	
+		where
+			card_code=#{card_code}
+	</select>
+	
+	
+	 <!-- 根据card_code充值到wallet_money-->
+     <update id="chargeWalletMoney" >
+    	update card
+		<set>
+		
+				wallet_money=#{wallet_money},
+			
+		</set>
+		where card_code=#{card_code}
+    </update>
+    
+     <!-- 根据card_code充值到monthly_money-->
+     <update id="chargeMonthlyMoney" >
+    	update card
+		<set>
+		monthly_money=#{monthly_money},		
+		</set>
+		where card_code=#{card_code}
+    </update>
+    
+    <!-- 统计卡张数 -->
+	<select id="countCard"  resultType="java.lang.Integer">
+		select count(card_id) from card 
+	</select>
+	
+	
+
+</mapper>
