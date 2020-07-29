@@ -12,7 +12,7 @@
 		<mybatis.spring.version>2.0.0</mybatis.spring.version>
 		<log4j.version>1.2.17</log4j.version>
 		<commons.dbcp.version>2.6.0</commons.dbcp.version>
-		<mysql.version>5.1.46</mysql.version>
+		<mysql.version>8.0.16</mysql.version>
 		<jstl.version>1.2</jstl.version>
 		<pagehelper.version>5.1.8</pagehelper.version>
 		<jackson.version>2.9.8</jackson.version>
