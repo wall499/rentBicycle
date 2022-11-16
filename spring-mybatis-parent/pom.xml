@@ -15,7 +15,7 @@
 		<mysql.version>5.1.46</mysql.version>
 		<jstl.version>1.2</jstl.version>
 		<pagehelper.version>5.1.8</pagehelper.version>
-		<jackson.version>2.9.8</jackson.version>
+		<jackson.version>2.12.7.1</jackson.version>
 		<hibernate-validator.version>6.0.15.Final</hibernate-validator.version>
 
 	</properties>
